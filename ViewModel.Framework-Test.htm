@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <title>视图模型框架-测试</title>
+    <script type = "text/javascript" src = "ViewModel.Framework-Core.js"></script>
+    <link rel = "Stylesheet" type = "text/css" href = "ViewModel.Framework-Test.css" />
+  </head>
+  <body>
+     <p>
+       请使用chrome浏览器按F12进入命令行模式,修改newViewModel.SourceModel下任意属性状态查看框架效果，
+       比如输入newViewModel.SourceModel.Position.X = 0;  建议查看本网页源代码或者框架Core文件，有说明。
+     </p>
+     <div class = "ViewModelPanel" v-property = "{Position.X}{Position.Y}{Visible}">
+       <div class = "ViewModelPanelHeader" v-property = "{DisplayText}"></div>
+       <div class = "ViewModelPanelContent">
+         <img alt = "" src = "" v-property = "{Scene.Source}{Scene.Size.Width}" />
+       </div>
+     </div>
+     <div class = "ViewModelPanel" v-property = "{Position.X}{Position.Y}{Visible}">
+       <div class = "ViewModelPanelHeader" v-property = "{DisplayText}"></div>
+       <div class = "ViewModelPanelContent">
+         <img alt = "" src = "" v-property = "{Scene.Source}{Scene.Size.Height}" />
+       </div>
+     </div>
+     <script type = "text/javascript">
+       (function(win) {
+         //初始化一个需要关联视图的模型
+         win.newViewModel = new win.ViewModel({ 
+           DisplayText: "视图模型测试容器", 
+           Visible: true,
+           Position: { X: -2, Y: 2 }, 
+           Scene: { Source: "img/A.jpg", Size: { Width: 1, Height: 1 } } 
+         });
+         //添加视图（可以是多个视图）
+         win.newViewModel.AddView(win.document.getElementsByClassName("ViewModelPanel")[0]);
+         win.newViewModel.AddView(win.document.getElementsByClassName("ViewModelPanel")[1]);
+         /***
+         让ViewModel与添加的视图产生关联（根据元素的v-property属性可以关联模型的多个property）,
+         当对应属性的值发生变化时，将通知回调函数去做指定的视图逻辑以此更新视图
+         ***/
+         win.newViewModel.BindViews("v-property", 
+           function(model, property, fullProperty, jsView) {
+  
+             switch(fullProperty) {
+    
+               case "DisplayText": {
+ 
+                 jsView.innerText = model[property];
+ 
+               }; break;
+  
+               case "Visible": {
+ 
+                 jsView.style.opacity = model[property] ? 1 : 0;
+               }; break;
+   
+               case "Position.X": {
+      
+                 var unitDistance = 10;
+      
+                 jsView.style.left = unitDistance * model[property] + "px";
+    
+               }; break;
+    
+               case "Position.Y": {
+      
+                 var unitDistance = 10;
+      
+                 jsView.style.top = unitDistance * model[property] + "px";
+    
+               }; break;
+    
+               case "Scene.Source": {
+      
+                 jsView.attributes["src"].value = model[property];
+    
+               }; break;
+    
+               case "Scene.Size.Width": {
+      
+                 jsView.style.width = model[property] * 100 + "%";
+    
+               }; break;
+    
+               case "Scene.Size.Height": {
+      
+                 jsView.style.height = model[property] * 100 + "%";
+    
+               }; break;
+  
+             }
+
+           });         
+
+       })(window)
+     </script>
+  </body>
+</html>
